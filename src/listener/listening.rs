@@ -172,6 +172,7 @@ impl Task {
                 }
             }
         }
+        crossterm::terminal::disable_raw_mode().ok();
         Ok(())
     }
 }
