@@ -1,14 +1,8 @@
+use crossterm::event::{self, KeyCode, KeyEvent};
 use std::{
-    io::{self, Stdout, Write},
+    io::{self},
     time::Duration,
     usize,
-};
-
-use crossterm::{
-    cursor,
-    event::{self, KeyCode, KeyEvent},
-    terminal::{self, ClearType},
-    ExecutableCommand,
 };
 
 pub struct Buffer {
@@ -44,51 +38,6 @@ impl Task {
         let s_index = 0;
         Task { buffer, s_index }
     }
-    pub fn display(&self) {
-        let mut stdout = io::stdout();
-
-        crossterm::terminal::enable_raw_mode().ok(); // ok() is for ignorint return value
-        stdout
-            .execute(crossterm::terminal::Clear(ClearType::All))
-            .ok();
-        stdout.execute(cursor::MoveTo(0, 0)).ok();
-        for (i, line) in self.buffer.iter().enumerate() {
-            stdout.execute(cursor::MoveTo(0, i as u16)).ok();
-            if i == self.s_index {
-                if !self.buffer[i].is_completed {
-                    println!("\x1b[31m>\x1b[34m [ ]{}\x1b[0m", line.line);
-                } else {
-                    println!("\x1b[31m>\x1b[34m [X]{}\x1b[0m", line.line);
-                }
-            } else {
-                if !self.buffer[i].is_completed {
-                    println!("[ ]{}", line.line);
-                } else {
-                    println!("[X]{}", line.line);
-                }
-            }
-        }
-        stdout.flush().ok();
-    }
-    pub fn display_popup(&self, line: &String, cas: bool) {
-        let mut stdout = io::stdout();
-        let (x, y) = terminal::size().unwrap();
-        crossterm::terminal::enable_raw_mode().ok();
-        if cas {
-            stdout
-                .execute(crossterm::terminal::Clear(ClearType::All))
-                .ok();
-        }
-        for (i, ch) in line.chars().enumerate() {
-            stdout
-                .execute(cursor::MoveTo((x / 2) + i as u16, y / 2))
-                .ok();
-            print!("{}", ch);
-        }
-        stdout
-            .execute(cursor::MoveTo((x / 2) + line.len() as u16, y / 2))
-            .ok();
-    }
     pub fn listen_delete(&mut self) {
         let str = "are you sure to delelete this task ?(y/n)";
         self.display_popup(&str.to_string(), false);
@@ -122,7 +71,7 @@ impl Task {
                             }
                         }
                         KeyCode::Down => {
-                            if self.s_index < self.buffer.len() {
+                            if self.s_index < self.buffer.len() - 1 {
                                 self.s_index += 1;
                             }
                         }
@@ -174,5 +123,8 @@ impl Task {
         }
         crossterm::terminal::disable_raw_mode().ok();
         Ok(())
+    }
+    pub fn save_task(&mut self) {
+        //TODO: save task in a history file
     }
 }
