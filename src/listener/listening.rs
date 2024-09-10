@@ -38,6 +38,7 @@ impl Task {
         let s_index = 0;
         Task { buffer, s_index }
     }
+    //listen y/n user input
     pub fn listen_delete(&mut self) {
         let str = "are you sure to delelete this task ?(y/n)";
         self.display_popup(&str.to_string(), false);
@@ -59,6 +60,7 @@ impl Task {
             }
         }
     }
+    //listen all user input
     pub fn listen(&mut self) -> io::Result<()> {
         loop {
             self.display();
@@ -89,6 +91,7 @@ impl Task {
                             'a' => {
                                 let mut buf = Buffer::new();
                                 loop {
+                                    //clear screen and display user input in center of sreen
                                     self.display_popup(&buf.line, true);
                                     if let event::Event::Key(KeyEvent { code, .. }) = event::read()?
                                     {
