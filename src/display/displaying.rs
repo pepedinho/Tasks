@@ -16,6 +16,7 @@ impl Task {
         stdout
             .execute(crossterm::terminal::Clear(ClearType::All))
             .ok();
+        stdout.execute(cursor::Hide).ok();
         stdout.execute(cursor::MoveTo(0, 0)).ok();
         for (i, line) in self.buffer.iter().enumerate() {
             stdout.execute(cursor::MoveTo(0, i as u16)).ok();
@@ -35,23 +36,31 @@ impl Task {
         }
         stdout.flush().ok();
     }
-    pub fn display_popup(&self, line: &String, cas: bool) {
+    pub fn display_popup(&self, line: &String) {
         let mut stdout = io::stdout();
-        let (x, y) = terminal::size().unwrap();
+        let (_x, y) = terminal::size().unwrap();
         crossterm::terminal::enable_raw_mode().ok();
-        if cas {
-            stdout
-                .execute(crossterm::terminal::Clear(ClearType::All))
-                .ok();
-        }
+        stdout.execute(cursor::MoveTo(0 as u16, y - 1)).ok();
+        stdout
+            .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
+            .ok();
         for (i, ch) in line.chars().enumerate() {
-            stdout
-                .execute(cursor::MoveTo((x / 2) + i as u16, y / 2))
-                .ok();
+            stdout.execute(cursor::MoveTo(i as u16, y - 1)).ok();
             print!("{}", ch);
         }
         stdout
-            .execute(cursor::MoveTo((x / 2) + line.len() as u16, y / 2))
+            .execute(cursor::MoveTo(line.len() as u16, y - 1))
             .ok();
+        stdout.execute(cursor::Show).ok();
+    }
+    pub fn clean_input(&self) {
+        let mut stdout = io::stdout();
+        stdout
+            .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
+            .ok();
+    }
+    pub fn show_cursor(&self) {
+        let mut stdout = io::stdout();
+        stdout.execute(cursor::Show).ok();
     }
 }

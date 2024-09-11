@@ -41,13 +41,18 @@ impl Task {
     //listen y/n user input
     pub fn listen_delete(&mut self) {
         let str = "are you sure to delelete this task ?(y/n)";
-        self.display_popup(&str.to_string(), false);
+        self.display_popup(&str.to_string());
         loop {
             if let event::Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
                 match code {
                     KeyCode::Char(c) => match c {
                         'y' => {
                             self.buffer.remove(self.s_index);
+                            if self.s_index > 0 {
+                                self.s_index -= 1;
+                            } else {
+                                self.s_index += 1;
+                            }
                             break;
                         }
                         'n' => {
@@ -92,7 +97,7 @@ impl Task {
                                 let mut buf = Buffer::new();
                                 loop {
                                     //clear screen and display user input in center of sreen
-                                    self.display_popup(&buf.line, true);
+                                    self.display_popup(&buf.line);
                                     if let event::Event::Key(KeyEvent { code, .. }) = event::read()?
                                     {
                                         match code {
@@ -104,6 +109,7 @@ impl Task {
                                             }
                                             KeyCode::Enter => {
                                                 buf.index = self.s_index + 1;
+                                                break;
                                             }
                                             KeyCode::Esc => {
                                                 break;
@@ -113,6 +119,7 @@ impl Task {
                                     }
                                 }
                                 self.buffer.push(buf);
+                                self.clean_input();
                             }
                             'd' => {
                                 self.listen_delete();
@@ -124,6 +131,7 @@ impl Task {
                 }
             }
         }
+        self.show_cursor();
         crossterm::terminal::disable_raw_mode().ok();
         Ok(())
     }
