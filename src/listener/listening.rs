@@ -135,7 +135,4 @@ impl Task {
         crossterm::terminal::disable_raw_mode().ok();
         Ok(())
     }
-    pub fn save_task(&mut self) {
-        //TODO: save task in a history file
-    }
 }
