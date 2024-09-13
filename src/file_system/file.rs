@@ -43,7 +43,8 @@ impl TaskBuf {
                                 self.sindex.s_index -= 1;
                             } else if self.sindex.s_index == 0 && self.sindex.s_index_buf > 0 {
                                 self.sindex.s_index_buf -= 1;
-                                self.sindex.s_index = 0;
+                                self.sindex.s_index =
+                                    self.tasks[self.sindex.s_index_buf].buffer.len() - 1;
                             }
                         }
                         KeyCode::Down => {
@@ -108,6 +109,7 @@ impl TaskBuf {
                                 }
                                 if let Some(last_char) = buf.line.chars().last() {
                                     if last_char == '/' {
+                                        buf.line.pop();
                                         task.name = buf.line;
                                         self.tasks.push(task);
                                     } else {
