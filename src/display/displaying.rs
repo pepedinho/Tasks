@@ -10,10 +10,25 @@ use crossterm::{
 use std::io::{self, Write};
 
 impl TaskBuf {
+    pub fn clean_board(&self) {
+        let mut stdout = io::stdout();
+        let mut ite = 0;
+
+        for (_i, task) in self.tasks.iter().enumerate() {
+            for _j in task.buffer.iter().enumerate() {
+                stdout.execute(cursor::MoveTo(0, ite as u16)).ok();
+                stdout
+                    .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
+                    .ok();
+                ite += 1;
+            }
+        }
+    }
     pub fn display(&self) {
         let mut stdout = io::stdout();
         let mut ite = 0;
 
+        self.clean_board();
         crossterm::terminal::enable_raw_mode().ok(); // ok() is for ignorint return value
         stdout.execute(cursor::Hide).ok();
         stdout.execute(cursor::MoveTo(0, 0)).ok();
@@ -21,9 +36,6 @@ impl TaskBuf {
             let mut show = false;
             for (j, line) in task.buffer.iter().enumerate() {
                 stdout.execute(cursor::MoveTo(0, ite as u16)).ok();
-                stdout
-                    .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
-                    .ok();
                 if task.buffer[0].is_deploy {
                     show = true;
                 }
@@ -66,7 +78,7 @@ impl TaskBuf {
                         if j < self.tasks[i].buffer.len() - 1 {
                             println!("    ├─[X]{}", line.line);
                         } else {
-                            println!("    └─[ ]{}", line.line);
+                            println!("    └─[X]{}", line.line);
                         }
                     }
                 }

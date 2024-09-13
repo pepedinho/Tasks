@@ -41,6 +41,7 @@ impl TaskBuf {
         stdout
             .execute(crossterm::terminal::Clear(ClearType::All))
             .ok();
+        self.file_to_task().ok();
         loop {
             self.display();
             if event::poll(Duration::from_millis(100))? {
@@ -163,6 +164,7 @@ impl TaskBuf {
         }
         self.show_cursor();
         crossterm::terminal::disable_raw_mode().ok();
+        self.save_task().ok();
         Ok(())
     }
     pub fn listen_delete(&mut self) {

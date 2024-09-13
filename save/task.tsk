@@ -1,5 +1,12 @@
-oui     0
-non     0
-peut etre     0
-je test la save    0
-je test avec une tache compeleté    0
+oui            --
+oui                1
+non                0
+peut etre                0
+je test la save               0
+je test avec une tache compeleté               1
+non            --
+test            0
+save test avec le nouveau system de "dossier"     1
+je test    0
+test  --
+ok  1
