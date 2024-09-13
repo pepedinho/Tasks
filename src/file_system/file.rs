@@ -1,5 +1,9 @@
 use crate::listener::listening::{Buffer, Task};
-use crossterm::event::{self, KeyCode, KeyEvent};
+use crossterm::{
+    event::{self, KeyCode, KeyEvent},
+    terminal::ClearType,
+    ExecutableCommand,
+};
 use std::{
     io::{self},
     time::Duration,
@@ -33,6 +37,10 @@ impl TaskBuf {
         TaskBuf { tasks, sindex }
     }
     pub fn listen(&mut self) -> io::Result<()> {
+        let mut stdout = io::stdout();
+        stdout
+            .execute(crossterm::terminal::Clear(ClearType::All))
+            .ok();
         loop {
             self.display();
             if event::poll(Duration::from_millis(100))? {
@@ -68,13 +76,31 @@ impl TaskBuf {
                         }
                         KeyCode::Enter => {
                             if self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index]
-                                .is_completed
+                                .is_dir
                             {
-                                self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index]
-                                    .is_completed = false;
+                                if self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index]
+                                    .is_deploy
+                                {
+                                    self.tasks[self.sindex.s_index_buf].buffer
+                                        [self.sindex.s_index]
+                                        .is_deploy = false;
+                                } else {
+                                    self.tasks[self.sindex.s_index_buf].buffer
+                                        [self.sindex.s_index]
+                                        .is_deploy = true;
+                                }
                             } else {
-                                self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index]
-                                    .is_completed = true;
+                                if self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index]
+                                    .is_completed
+                                {
+                                    self.tasks[self.sindex.s_index_buf].buffer
+                                        [self.sindex.s_index]
+                                        .is_completed = false;
+                                } else {
+                                    self.tasks[self.sindex.s_index_buf].buffer
+                                        [self.sindex.s_index]
+                                        .is_completed = true;
+                                }
                             }
                         }
                         KeyCode::Esc => {
@@ -110,7 +136,9 @@ impl TaskBuf {
                                 if let Some(last_char) = buf.line.chars().last() {
                                     if last_char == '/' {
                                         buf.line.pop();
-                                        task.name = buf.line;
+                                        buf.is_dir = true;
+                                        buf.is_deploy = true;
+                                        task.buffer.push(buf);
                                         self.tasks.push(task);
                                     } else {
                                         if self.tasks.is_empty() {

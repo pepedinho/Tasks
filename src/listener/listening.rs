@@ -10,6 +10,8 @@ pub struct Buffer {
     pub index: usize,
     pub is_selected: bool,
     pub is_completed: bool,
+    pub is_dir: bool,
+    pub is_deploy: bool,
 }
 
 pub struct Task {
@@ -24,11 +26,15 @@ impl Buffer {
         let index = 0;
         let is_selected = false;
         let is_completed = false;
+        let is_dir = false;
+        let is_deploy = true;
         Buffer {
             line,
             index,
             is_selected,
             is_completed,
+            is_dir,
+            is_deploy,
         }
     }
 }

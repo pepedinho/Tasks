@@ -15,31 +15,64 @@ impl TaskBuf {
         let mut ite = 0;
 
         crossterm::terminal::enable_raw_mode().ok(); // ok() is for ignorint return value
-        stdout
-            .execute(crossterm::terminal::Clear(ClearType::All))
-            .ok();
         stdout.execute(cursor::Hide).ok();
         stdout.execute(cursor::MoveTo(0, 0)).ok();
         for (i, task) in self.tasks.iter().enumerate() {
-            stdout.execute(cursor::MoveTo(0, ite as u16)).ok();
-            println!("---[{}]---", task.name);
-            ite += 1;
+            let mut show = false;
             for (j, line) in task.buffer.iter().enumerate() {
                 stdout.execute(cursor::MoveTo(0, ite as u16)).ok();
-                if i == self.sindex.s_index_buf && j == self.sindex.s_index {
-                    if !self.tasks[i].buffer[j].is_completed {
-                        println!("\x1b[31m>\x1b[34m\t[ ]{}\x1b[0m", line.line);
-                    } else {
-                        println!("\x1b[31m>\x1b[34m\t[X]{}\x1b[0m", line.line);
+                stdout
+                    .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
+                    .ok();
+                if task.buffer[0].is_deploy {
+                    show = true;
+                }
+                if line.is_dir && self.is_selected_index(i, j) {
+                    println!(
+                        "\x1b[31m>\x1b[34m {} {}\x1b[0m",
+                        if show { '⌄' } else { '>' },
+                        line.line
+                    );
+                    if !show {
+                        ite += 1;
                     }
-                } else {
+                } else if line.is_dir {
+                    println!("  {} {}", if show { '⌄' } else { '>' }, line.line);
+                    if !show {
+                        ite += 1;
+                    }
+                } else if self.is_selected_index(i, j) && show {
                     if !self.tasks[i].buffer[j].is_completed {
-                        println!(" \t[ ]{}", line.line);
+                        if j < self.tasks[i].buffer.len() - 1 {
+                            println!("\x1b[31m>\x1b[34m   ├─[ ]{}\x1b[0m", line.line);
+                        } else {
+                            println!("\x1b[31m>\x1b[34m   └─[ ]{}\x1b[0m", line.line);
+                        }
+                    } else if show {
+                        if j < self.tasks[i].buffer.len() - 1 {
+                            println!("\x1b[31m>\x1b[34m   ├─[X]{}\x1b[0m", line.line);
+                        } else {
+                            println!("\x1b[31m>\x1b[34m   └─[X]{}\x1b[0m", line.line);
+                        }
+                    }
+                } else if show {
+                    if !self.tasks[i].buffer[j].is_completed {
+                        if j < self.tasks[i].buffer.len() - 1 {
+                            println!("    ├─[ ]{}", line.line);
+                        } else {
+                            println!("    └─[ ]{}", line.line);
+                        }
                     } else {
-                        println!(" \t[X]{}", line.line);
+                        if j < self.tasks[i].buffer.len() - 1 {
+                            println!("    ├─[X]{}", line.line);
+                        } else {
+                            println!("    └─[ ]{}", line.line);
+                        }
                     }
                 }
-                ite += 1;
+                if show {
+                    ite += 1;
+                }
             }
         }
         stdout.execute(cursor::MoveTo(0, 30)).ok();
@@ -76,5 +109,11 @@ impl TaskBuf {
     pub fn show_cursor(&self) {
         let mut stdout = io::stdout();
         stdout.execute(cursor::Show).ok();
+    }
+    pub fn is_selected_index(&self, i: usize, j: usize) -> bool {
+        if i == self.sindex.s_index_buf && j == self.sindex.s_index {
+            return true;
+        }
+        false
     }
 }
