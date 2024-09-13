@@ -1,12 +1,7 @@
-oui            --
-oui                1
-non                0
-peut etre                0
-je test la save               0
-je test avec une tache compeleté               1
-non            --
-test            0
-save test avec le nouveau system de "dossier"     1
-je test    0
-test  --
-ok  1
+oui  --
+je test la save  1
+je test avec une tache complete  1
+je test un nouveau dossier de taches  0
+new  --
+je test une nouvelle tache dans le dossier de tache  0
+il suffit de rajouter "/" a la fin de sa saisi pour creer un dossier de taches  1

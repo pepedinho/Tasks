@@ -154,6 +154,7 @@ impl TaskBuf {
                             }
                             'd' => {
                                 self.listen_delete();
+                                self.clean_input();
                             }
                             _ => {}
                         },
@@ -175,9 +176,18 @@ impl TaskBuf {
                 match code {
                     KeyCode::Char(c) => match c {
                         'y' => {
-                            self.tasks[self.sindex.s_index_buf]
-                                .buffer
-                                .remove(self.sindex.s_index);
+                            if self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index]
+                                .is_dir
+                            {
+                                self.tasks.remove(self.sindex.s_index_buf);
+                                if self.sindex.s_index_buf > self.tasks.len() - 1 {
+                                    self.sindex.s_index_buf -= 1;
+                                }
+                            } else {
+                                self.tasks[self.sindex.s_index_buf]
+                                    .buffer
+                                    .remove(self.sindex.s_index);
+                            }
                             if self.sindex.s_index > 0 {
                                 self.sindex.s_index -= 1;
                             } else {
@@ -194,5 +204,6 @@ impl TaskBuf {
                 }
             }
         }
+        self.clean_all();
     }
 }

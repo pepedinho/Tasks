@@ -128,4 +128,10 @@ impl TaskBuf {
         }
         false
     }
+    pub fn clean_all(&self) {
+        let mut stdout = io::stdout();
+        stdout
+            .execute(crossterm::terminal::Clear(ClearType::All))
+            .ok();
+    }
 }
