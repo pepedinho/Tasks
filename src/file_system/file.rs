@@ -17,6 +17,7 @@ pub struct Sindex {
 pub struct TaskBuf {
     pub tasks: Vec<Task>,
     pub sindex: Sindex,
+    pub filename: String,
 }
 
 impl Sindex {
@@ -34,13 +35,19 @@ impl TaskBuf {
     pub fn new() -> Self {
         let tasks = Vec::new();
         let sindex = Sindex::new();
-        TaskBuf { tasks, sindex }
+        let filename = "save/task.tsk".to_string();
+        TaskBuf {
+            tasks,
+            sindex,
+            filename,
+        }
     }
     pub fn listen(&mut self) -> io::Result<()> {
         let mut stdout = io::stdout();
         stdout
             .execute(crossterm::terminal::Clear(ClearType::All))
             .ok();
+        self.search_tsk_file();
         self.file_to_task().ok();
         loop {
             self.display();

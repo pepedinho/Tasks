@@ -6,12 +6,11 @@ use std::io::{self, BufRead, BufReader, Write};
 
 impl TaskBuf {
     pub fn file_to_task(&mut self) -> io::Result<()> {
-        let file_path = "save/task.tsk";
         let file = OpenOptions::new()
             .read(true)
             .write(true)
             .create(true)
-            .open(file_path)?;
+            .open(&self.filename)?;
         let reader = BufReader::new(&file);
         let mut b_index = 0;
         for (index, line) in reader.lines().enumerate() {
@@ -61,7 +60,7 @@ impl TaskBuf {
         Ok(())
     }
     pub fn save_task(&mut self) -> io::Result<()> {
-        let mut file = File::create("save/task.tsk")?;
+        let mut file = File::create(&self.filename)?;
         for (_i, task) in self.tasks.iter().enumerate() {
             for (_j, line) in task.buffer.iter().enumerate() {
                 if line.is_dir {
@@ -74,5 +73,16 @@ impl TaskBuf {
             }
         }
         Ok(())
+    }
+    pub fn search_tsk_file(&mut self) {
+        // serche files with ".tsk" extension in current directory
+        let paths = std::fs::read_dir(".").unwrap();
+        for path in paths {
+            let path = path.unwrap().path();
+            let file_name = path.file_name().unwrap().to_str().unwrap();
+            if file_name.ends_with(".tsk") {
+                self.filename = file_name.to_string();
+            }
+        }
     }
 }
