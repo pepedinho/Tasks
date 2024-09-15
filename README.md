@@ -1,4 +1,4 @@
-# Task 🚀
+# Task ✅
 
 **Task** is a command-line task manager developed in Rust. It allows you to manage your tasks and folders in a simple and persistent manner.
 
