@@ -148,6 +148,26 @@ impl TaskBuf {
                                         buf.is_deploy = true;
                                         task.buffer.push(buf);
                                         self.tasks.push(task);
+                                    } else if buf.line.contains('/') {
+                                        let count = buf.line.matches('/').count();
+                                        if count == 1 {
+                                            let mut split_iter = buf.line.split('/');
+                                            let mut buf_dir = Buffer::new();
+                                            let dir = split_iter.next().unwrap();
+                                            let task_l = split_iter.next().unwrap();
+                                            buf_dir.line = dir.to_string();
+                                            buf_dir.is_dir = true;
+                                            buf_dir.is_deploy = true;
+                                            task.buffer.push(buf_dir);
+                                            let mut buf_t = Buffer::new();
+                                            buf_t.line = task_l.to_string();
+                                            task.buffer.push(buf_t);
+                                            self.tasks.push(task);
+                                        } else {
+                                            let str = "to much directory";
+                                            self.clean_input();
+                                            self.display_warning(&str.to_string());
+                                        }
                                     } else {
                                         if self.tasks.is_empty() {
                                             task.buffer.push(buf);

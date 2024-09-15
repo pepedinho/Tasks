@@ -1,13 +1,16 @@
 use crate::file_system::file::TaskBuf;
-use crate::listener::listening::Task;
 
 use crossterm::{
     cursor,
+    style::{Color, ResetColor, SetForegroundColor},
     terminal::{self, ClearType},
     ExecutableCommand,
 };
 
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    thread,
+};
 
 impl TaskBuf {
     pub fn clean_board(&self) {
@@ -111,6 +114,33 @@ impl TaskBuf {
             .execute(cursor::MoveTo(line.len() as u16, y - 1))
             .ok();
         stdout.execute(cursor::Show).ok();
+    }
+    pub fn display_warning(&self, line: &str) {
+        let line_clone = line.to_string();
+        let mut stdout = io::stdout();
+        let (_x, y) = terminal::size().unwrap();
+
+        //display wargning in another thread to avoid blocking the main thread
+        thread::spawn(move || {
+            crossterm::terminal::enable_raw_mode().ok();
+            stdout.execute(cursor::MoveTo(0 as u16, y - 2)).ok();
+            stdout
+                .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
+                .ok();
+            for (i, ch) in line_clone.chars().enumerate() {
+                stdout.execute(cursor::MoveTo(i as u16, y - 2)).ok();
+                stdout.execute(SetForegroundColor(Color::Yellow)).ok();
+                print!("{}", ch);
+                stdout.execute(ResetColor).ok();
+            }
+            std::thread::sleep(std::time::Duration::from_secs(2));
+            stdout
+                .execute(cursor::MoveTo(line_clone.len() as u16, y - 2))
+                .ok();
+            stdout
+                .execute(crossterm::terminal::Clear(ClearType::CurrentLine))
+                .ok();
+        });
     }
     pub fn clean_input(&self) {
         let mut stdout = io::stdout();
