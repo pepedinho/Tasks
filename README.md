@@ -35,11 +35,11 @@
 1. **Ensure Rust is Installed**: You can install Rust from [rust-lang.org](https://www.rust-lang.org/).
 2. **Clone the Project**:
    ```sh
-   git clone https://github.com/pepedihno/task.git
+   git clone https://github.com/pepedinho/tasks.git
    ```
 3. **Navigate to the Project Directory:**:
    ```s
-   cd task
+   cd tasks
    ```
 4. **Build the Project**:
    ```sh
