@@ -46,23 +46,23 @@ impl TaskBuf {
         }
     }
 
-    pub(crate) fn add(&mut self) -> io::Result<()> {
-        let mut buf = Buffer::new();
-        let mut task = Task::new();
+    fn get_input(&mut self, buf: Option<&mut Buffer>) -> io::Result<String> {
+        let mut line = String::new();
         loop {
-            //clear screen and display user input in center of sreen
-            self.display_popup(&buf.line);
+            self.display_popup(&line);
             if let event::Event::Key(KeyEvent { code, .. }) = event::read()? {
                 match code {
                     KeyCode::Char(ca) => {
-                        buf.line.push(ca);
-                    }
-                    KeyCode::Backspace => {
-                        buf.line.pop();
+                        line.push(ca);
                     }
                     KeyCode::Enter => {
-                        buf.index = self.sindex.s_index + 1;
+                        if let Some(buffer) = buf {
+                            buffer.index = self.sindex.s_index + 1;
+                        }
                         break;
+                    }
+                    KeyCode::Backspace => {
+                        line.pop();
                     }
                     KeyCode::Esc => {
                         break;
@@ -71,6 +71,13 @@ impl TaskBuf {
                 }
             }
         }
+        Ok(line)
+    }
+
+    pub(crate) fn add(&mut self) -> io::Result<()> {
+        let mut buf = Buffer::new();
+        let mut task = Task::new();
+        buf.line = self.get_input(Some(&mut buf))?;
         if let Some(last_char) = buf.line.chars().last() {
             if last_char == '/' {
                 buf.line.pop();
@@ -107,6 +114,12 @@ impl TaskBuf {
                 }
             }
         }
+        self.clean_input();
+        Ok(())
+    }
+    pub(crate) fn modif(&mut self) -> io::Result<()> {
+        self.tasks[self.sindex.s_index_buf].buffer[self.sindex.s_index].line =
+            self.get_input(None)?;
         self.clean_input();
         Ok(())
     }

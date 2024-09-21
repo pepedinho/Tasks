@@ -1,5 +1,4 @@
 use crate::file_system::file::TaskBuf;
-use crate::listener::utils;
 
 use crossterm::{
     event::{self, KeyCode, KeyEvent},
@@ -75,6 +74,9 @@ impl TaskBuf {
                         KeyCode::Char(c) => match c {
                             'a' => {
                                 self.add()?;
+                            }
+                            'm' => {
+                                self.modif()?;
                             }
                             'd' => {
                                 self.listen_delete();
