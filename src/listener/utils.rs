@@ -119,7 +119,7 @@ impl TaskBuf {
                     task.buffer.push(buf_t);
                     self.tasks.push(task);
                 } else {
-                    let str = "to much directory";
+                    let str = "To much directory";
                     self.clean_input();
                     self.display_warning(&str.to_string());
                 }

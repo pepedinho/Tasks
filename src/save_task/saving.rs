@@ -64,11 +64,11 @@ impl TaskBuf {
         for (_i, task) in self.tasks.iter().enumerate() {
             for (_j, line) in task.buffer.iter().enumerate() {
                 if line.is_dir {
-                    writeln!(file, "{} --", line.line)?;
+                    writeln!(file, "{} --", line.line.trim())?;
                 } else if line.is_completed {
-                    writeln!(file, "{} 1", line.line)?;
+                    writeln!(file, "{} 1", line.line.trim())?;
                 } else {
-                    writeln!(file, "{} 0", line.line)?;
+                    writeln!(file, "{} 0", line.line.trim())?;
                 }
             }
         }
