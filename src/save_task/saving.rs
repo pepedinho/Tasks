@@ -82,7 +82,9 @@ impl TaskBuf {
             let file_name = path.file_name().unwrap().to_str().unwrap();
             if file_name.ends_with(".tsk") {
                 self.filename = file_name.to_string();
+                return;
             }
         }
+        self.filename = "tasks.tsk".to_string();
     }
 }
