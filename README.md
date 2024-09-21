@@ -25,11 +25,6 @@
    - Press `a` to start input.
    - Type the folder name followed by the task name, for example: `my_folder/my_first_task`.
 
-## 🚀 Coming Soon
-
-- **Automatic `.tsk` File Creation**: Run Task with an argument to automatically create a `.tsk` file.
-- **More Features**: Additional features will be added to enhance task management.
-
 ## 📥 Installation
 
 1. **Ensure Rust is Installed**: You can install Rust from [rust-lang.org](https://www.rust-lang.org/).
