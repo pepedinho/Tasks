@@ -6,18 +6,36 @@ use std::io::{self};
 
 impl TaskBuf {
     pub(crate) fn up(&mut self) {
+        let buf = &self.tasks[self.sindex.s_index_buf].buffer[0];
+        self.clean_input();
         if self.sindex.s_index > 0 {
-            self.sindex.s_index -= 1;
+            if buf.is_deploy {
+                self.sindex.s_index -= 1;
+            } else if self.sindex.s_index_buf > 0 {
+                self.sindex.s_index_buf -= 1;
+                self.sindex.s_index = 0;
+            }
         } else if self.sindex.s_index == 0 && self.sindex.s_index_buf > 0 {
-            self.sindex.s_index_buf -= 1;
-            self.sindex.s_index = self.tasks[self.sindex.s_index_buf].buffer.len() - 1;
+            if self.tasks[self.sindex.s_index_buf - 1].buffer[0].is_deploy {
+                self.sindex.s_index_buf -= 1;
+                self.sindex.s_index = self.tasks[self.sindex.s_index_buf].buffer.len() - 1;
+            } else {
+                self.sindex.s_index_buf -= 1;
+                self.sindex.s_index = 0;
+            }
         }
     }
 
     pub(crate) fn down(&mut self) {
+        let buf = &self.tasks[self.sindex.s_index_buf].buffer[0];
         if !self.tasks.is_empty() && !self.tasks[self.sindex.s_index_buf].buffer.is_empty() {
             if self.sindex.s_index < self.tasks[self.sindex.s_index_buf].buffer.len() - 1 {
-                self.sindex.s_index += 1;
+                if buf.is_deploy {
+                    self.sindex.s_index += 1;
+                } else if self.sindex.s_index_buf < self.tasks.len() - 1 {
+                    self.sindex.s_index_buf += 1;
+                    self.sindex.s_index = 0;
+                }
             } else if self.sindex.s_index == self.tasks[self.sindex.s_index_buf].buffer.len() - 1
                 && self.sindex.s_index_buf < self.tasks.len() - 1
             {
